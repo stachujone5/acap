@@ -5,6 +5,7 @@ use std::io::BufWriter;
 use std::sync::{Arc, Mutex};
 
 #[tauri::command]
+#[specta::specta]
 pub fn record_audio() -> Result<(), String> {
     let host = cpal::default_host();
 
