@@ -1,15 +1,15 @@
 "use client";
 
 import { Skeleton } from "@/ui/skeleton";
-import { getRecordings } from "@/utils/bindings";
+import { getAcapFiles } from "@/utils/bindings";
 import { useQuery } from "@tanstack/react-query";
 
 import { convertFileSrc } from "@tauri-apps/api/tauri";
 
-const getRecordingsFn = async () => {
-	const recordings = await getRecordings();
+const getRecordings = async () => {
+	const acapFiles = await getAcapFiles();
 
-	const convertedRecordings = recordings.map((r) => {
+	const convertedRecordings = acapFiles.map((r) => {
 		return {
 			path: convertFileSrc(r.path),
 			name: r.name,
@@ -22,7 +22,7 @@ const getRecordingsFn = async () => {
 const Recordings = () => {
 	const { data } = useQuery({
 		queryKey: ["recordings"],
-		queryFn: getRecordingsFn,
+		queryFn: getRecordings,
 	});
 
 	return (

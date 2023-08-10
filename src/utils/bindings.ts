@@ -14,12 +14,12 @@ export function recordAudio() {
     return invoke()<null>("record_audio")
 }
 
-export function getSaveDir() {
-    return invoke()<string>("get_save_dir")
+export function getAcapDir() {
+    return invoke()<string>("get_acap_dir")
 }
 
-export function getRecordings() {
-    return invoke()<File[]>("get_recordings")
+export function getAcapFiles() {
+    return invoke()<AcapFile[]>("get_acap_files")
 }
 
-export type File = { name: string; path: string }
+export type AcapFile = { name: string; path: string }

@@ -5,7 +5,7 @@ use std::io::BufWriter;
 use std::sync::{Arc, Mutex};
 use std::time::SystemTime;
 
-use crate::fs::get_save_dir;
+use crate::acap_fs::get_acap_dir;
 
 #[tauri::command]
 #[specta::specta]
@@ -27,7 +27,7 @@ pub fn record_audio() -> Result<(), String> {
 
     println!("Default output config: {:?}", config);
 
-    let mut path = get_save_dir().expect("Failed to get default save dir");
+    let mut path = get_acap_dir().expect("Failed to get default save dir");
 
     let current_time = SystemTime::now();
 
