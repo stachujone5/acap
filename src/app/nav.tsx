@@ -38,7 +38,7 @@ export const Nav = () => {
 	const { setTheme } = useTheme();
 
 	return (
-		<NavigationMenuPrimitive.Root className="relative z-10 flex flex-1 items-center border-b pb-2">
+		<NavigationMenuPrimitive.Root className="relative z-10 flex items-center border-b pb-2">
 			<NavigationMenuPrimitive.List className="group flex flex-1 list-none items-center justify-center space-x-1">
 				<NavigationMenuPrimitive.Item>
 					<Link href="/">Home</Link>

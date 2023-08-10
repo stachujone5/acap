@@ -53,4 +53,19 @@
 	* {
 		@apply border-border;
 	}
+
+	::-webkit-scrollbar-thumb {
+		@apply bg-muted;
+	}
+}
+
+::-webkit-scrollbar {
+	width: 1.5rem;
+}
+
+::-webkit-scrollbar-thumb {
+	height: 1rem;
+	border: 0.5rem solid rgba(0, 0, 0, 0);
+	background-clip: padding-box;
+	border-radius: 0.84rem;
 }

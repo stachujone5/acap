@@ -3,6 +3,9 @@ use cpal::{FromSample, Sample};
 use std::fs::File;
 use std::io::BufWriter;
 use std::sync::{Arc, Mutex};
+use std::time::SystemTime;
+
+use crate::fs::get_save_dir;
 
 #[tauri::command]
 #[specta::specta]
@@ -24,9 +27,19 @@ pub fn record_audio() -> Result<(), String> {
 
     println!("Default output config: {:?}", config);
 
-    let desktop_dir = dirs::desktop_dir().ok_or("Failed to get desktop directory")?;
-    let mut path = desktop_dir.clone();
-    path.push("sample.wav");
+    let mut path = get_save_dir().expect("Failed to get default save dir");
+
+    let current_time = SystemTime::now();
+
+    let unix_timestamp = current_time
+        .duration_since(SystemTime::UNIX_EPOCH)
+        .unwrap()
+        .as_secs();
+
+    // name the file
+    let file_name = format!("{}.wav", unix_timestamp);
+
+    path.push(file_name);
 
     let spec = wav_spec_from_config(&config);
     let writer = hound::WavWriter::create(path, spec).map_err(|_| "Failed to create WAV writer")?;

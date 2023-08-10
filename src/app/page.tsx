@@ -5,13 +5,15 @@ import { recordAudio } from "@/utils/bindings";
 import { useMutation } from "@tanstack/react-query";
 
 const Home = () => {
-	const { mutate: startRecording } = useMutation({
+	const { mutate: startRecording, isLoading } = useMutation({
 		mutationFn: recordAudio,
 	});
 
 	return (
 		<div>
-			<Button onClick={() => startRecording()}>Record</Button>
+			<Button disabled={isLoading} onClick={() => startRecording()}>
+				Record
+			</Button>
 		</div>
 	);
 };
