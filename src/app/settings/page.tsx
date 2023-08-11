@@ -5,14 +5,14 @@ import { Toggle } from "@/ui/toggle";
 import { useState } from "react";
 import { dialog } from "@tauri-apps/api";
 import { useQuery } from "@tanstack/react-query";
-import { getAcapDir } from "@/utils/bindings";
+import { getConfig } from "@/utils/bindings";
 
 const Settings = () => {
 	const [pressed, setPressed] = useState(false);
 	const [key, setKey] = useState("F10");
 	const { data } = useQuery({
 		queryKey: ["directory"],
-		queryFn: getAcapDir,
+		queryFn: getConfig,
 	});
 
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
@@ -48,7 +48,7 @@ const Settings = () => {
 				>
 					Change save directory
 				</Button>
-				<p>{data}</p>
+				<p>{data?.save_path}</p>
 			</div>
 		</div>
 	);

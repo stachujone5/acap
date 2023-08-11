@@ -22,11 +22,11 @@
 			},
 			"fs": {
 				"all": false,
-				"scope": ["$DOCUMENT/acap/*"]
+				"scope": ["**"]
 			},
 			"protocol": {
 				"asset": true,
-				"assetScope": ["$DOCUMENT/acap/*"]
+				"assetScope": ["**"]
 			}
 		},
 		"bundle": {

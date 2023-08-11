@@ -1,11 +1,10 @@
+use crate::config::get_config;
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use cpal::{FromSample, Sample};
 use std::fs::File;
 use std::io::BufWriter;
 use std::sync::{Arc, Mutex};
 use std::time::SystemTime;
-
-use crate::acap_fs::get_acap_dir;
 
 #[tauri::command]
 #[specta::specta]
@@ -16,18 +15,15 @@ pub fn record_audio() -> Result<(), String> {
         .default_output_device()
         .expect("failed to find default output device");
 
-    println!(
-        "Output device: {}",
-        device.name().expect("Failed to get the device name")
-    );
-
     let config = device
         .default_output_config()
         .expect("Failed to get default output config");
 
     println!("Default output config: {:?}", config);
 
-    let mut path = get_acap_dir().expect("Failed to get default save dir");
+    let config_file = get_config().unwrap();
+
+    let mut path = config_file.save_path;
 
     let current_time = SystemTime::now();
 

@@ -14,8 +14,8 @@ export function recordAudio() {
     return invoke()<null>("record_audio")
 }
 
-export function getAcapDir() {
-    return invoke()<string>("get_acap_dir")
+export function getConfig() {
+    return invoke()<Config>("get_config")
 }
 
 export function getAcapFiles() {
@@ -23,3 +23,4 @@ export function getAcapFiles() {
 }
 
 export type AcapFile = { name: string; path: string }
+export type Config = { save_path: string; recording_duration_in_secs: number }
