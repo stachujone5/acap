@@ -26,5 +26,5 @@ export function getAcapFiles() {
     return invoke()<AcapFile[]>("get_acap_files")
 }
 
-export type Config = { save_path: string; recording_duration_in_secs: number; project_dir: string }
+export type Config = { config_file_path: string; save_path: string; recording_duration_in_secs: number }
 export type AcapFile = { name: string; path: string }

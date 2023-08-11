@@ -8,9 +8,9 @@ use toml;
 #[derive(Serialize, Deserialize, Type)]
 
 pub struct Config {
+    pub config_file_path: PathBuf,
     pub save_path: PathBuf,
     pub recording_duration_in_secs: u32,
-    pub project_dir: PathBuf,
 }
 
 impl Config {
@@ -29,7 +29,7 @@ impl Config {
         Config {
             save_path: project_dir.clone(),
             recording_duration_in_secs: 30,
-            project_dir: project_dir.clone(),
+            config_file_path: project_dir.clone().join("config.toml"),
         }
     }
 
@@ -38,17 +38,14 @@ impl Config {
         let config = Self::default();
         let toml = toml::to_string(&config).unwrap();
 
-        let mut config_file = fs::File::create(config.project_dir.join("config.toml")).unwrap();
+        let mut config_file = fs::File::create(config.config_file_path).unwrap();
 
         config_file.write_all(toml.as_bytes()).unwrap()
     }
 
     // Returns the project's config
     pub fn get_config() -> Self {
-        let project_dir = Self::default().project_dir;
-        let config_file_path = project_dir.join("config.toml");
-
-        let toml = fs::read_to_string(config_file_path).unwrap();
+        let toml = fs::read_to_string(Self::default().config_file_path).unwrap();
 
         let config: Config = toml::from_str(&toml).unwrap();
 
@@ -56,15 +53,12 @@ impl Config {
     }
 
     // Sets the project's config
-    pub fn set_config(config: Config) -> Result<Config, ()> {
-        let dir = Config::default().project_dir;
-        let config_path = dir.join("config.toml");
-
+    pub fn set_config(config: Config) -> Config {
         let toml = toml::to_string(&config).unwrap();
 
-        fs::write(config_path, toml).unwrap();
+        fs::write(Self::default().config_file_path, toml).unwrap();
 
-        Ok(config)
+        config
     }
 }
 

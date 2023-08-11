@@ -18,12 +18,15 @@ fn get_config() -> Config {
 
 #[tauri::command]
 #[specta::specta]
-fn set_config_save_path(save_path: PathBuf) -> Result<Config, ()> {
+fn set_config_save_path(save_path: PathBuf) -> Config {
     let config = Config::get_config();
-    Config::set_config(Config {
+
+    let config = Config::set_config(Config {
         save_path,
         ..config
-    })
+    });
+
+    config
 }
 
 fn main() {
