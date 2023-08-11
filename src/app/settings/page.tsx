@@ -4,15 +4,32 @@ import { Button } from "@/ui/button";
 import { Toggle } from "@/ui/toggle";
 import { useState } from "react";
 import { dialog } from "@tauri-apps/api";
-import { useQuery } from "@tanstack/react-query";
-import { getConfig } from "@/utils/bindings";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { setConfigSavePath } from "@/utils/bindings";
+import { CONFIG_QUERY_KEY, useConfig } from "@/utils/useConfig";
+import { Skeleton } from "@/ui/skeleton";
+
+const handleSavePathChange = async () => {
+	const pathSelectedByUser = await dialog.open({
+		directory: true,
+	});
+
+	if (typeof pathSelectedByUser !== "string") {
+		throw new Error("Invalid files / folders selected!");
+	}
+
+	return setConfigSavePath(pathSelectedByUser);
+};
 
 const Settings = () => {
 	const [pressed, setPressed] = useState(false);
 	const [key, setKey] = useState("F10");
-	const { data } = useQuery({
-		queryKey: ["directory"],
-		queryFn: getConfig,
+
+	const queryClient = useQueryClient();
+	const { data } = useConfig();
+	const { mutate } = useMutation({
+		mutationFn: handleSavePathChange,
+		onSuccess: (newConfig) => queryClient.setQueryData(CONFIG_QUERY_KEY, newConfig),
 	});
 
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
@@ -36,19 +53,16 @@ const Settings = () => {
 			</div>
 
 			<div className="flex items-center gap-4">
-				<Button
-					onClick={() =>
-						void dialog
-							.open({
-								directory: true,
-							})
-							.then((r) => console.log(r))
-					}
-					className="w-fit"
-				>
+				<Button onClick={() => mutate()} className="w-fit">
 					Change save directory
 				</Button>
-				<p>{data?.save_path}</p>
+				{data ? (
+					<p>{data.save_path}</p>
+				) : (
+					<Skeleton className="w-1/3">
+						<p className="text-transparent">Loading</p>
+					</Skeleton>
+				)}
 			</div>
 		</div>
 	);

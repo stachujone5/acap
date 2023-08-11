@@ -18,9 +18,13 @@ export function getConfig() {
     return invoke()<Config>("get_config")
 }
 
+export function setConfigSavePath(savePath: string) {
+    return invoke()<Config>("set_config_save_path", { savePath })
+}
+
 export function getAcapFiles() {
     return invoke()<AcapFile[]>("get_acap_files")
 }
 
+export type Config = { save_path: string; recording_duration_in_secs: number; project_dir: string }
 export type AcapFile = { name: string; path: string }
-export type Config = { save_path: string; recording_duration_in_secs: number }

@@ -1,4 +1,4 @@
-use crate::config::get_config;
+use crate::config::Config;
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use cpal::{FromSample, Sample};
 use std::fs::File;
@@ -21,7 +21,7 @@ pub fn record_audio() -> Result<(), String> {
 
     println!("Default output config: {:?}", config);
 
-    let config_file = get_config().unwrap();
+    let config_file = Config::get_config();
 
     let mut path = config_file.save_path;
 
