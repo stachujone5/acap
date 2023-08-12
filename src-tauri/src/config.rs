@@ -36,11 +36,13 @@ impl Config {
     // Attempts to create a default config.toml file in project's directory
     pub fn new() {
         let config = Self::default();
-        let toml = toml::to_string(&config).unwrap();
 
-        let mut config_file = fs::File::create(config.config_file_path).unwrap();
+        if !config.config_file_path.exists() {
+            let toml = toml::to_string(&config).unwrap();
+            let mut config_file = fs::File::create(config.config_file_path).unwrap();
 
-        config_file.write_all(toml.as_bytes()).unwrap()
+            config_file.write_all(toml.as_bytes()).unwrap()
+        }
     }
 
     // Returns the project's config

@@ -64,6 +64,13 @@ const Settings = () => {
 					</Skeleton>
 				)}
 			</div>
+			{	data ? (
+				<p>Recording duration: {data.recording_duration_in_secs} seconds</p>
+			) : (
+				<Skeleton className="w-1/3">
+					<p className="text-transparent">Loading</p>
+				</Skeleton>
+			)}
 		</div>
 	);
 };
