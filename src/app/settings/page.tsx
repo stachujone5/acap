@@ -2,7 +2,7 @@
 
 import { Button } from "@/ui/button";
 import { Toggle } from "@/ui/toggle";
-import { useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { dialog } from "@tauri-apps/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateConfigKey } from "@/utils/bindings";
@@ -11,6 +11,8 @@ import { Skeleton } from "@/ui/skeleton";
 import { Input } from "@/ui/input";
 import { Label } from "@/ui/label";
 import { z } from "zod";
+
+const recordingDurationSchema = z.coerce.number().int().min(1).max(600);
 
 const handleSavePathChange = async () => {
 	const pathSelectedByUser = await dialog.open({
@@ -31,7 +33,10 @@ const handleRecordingDurationChange = (newRecordingDuration: number) => {
 const Settings = () => {
 	const [pressed, setPressed] = useState(false);
 	const [key, setKey] = useState("F10");
-	const recordingDurationInputRef = useRef<HTMLInputElement>(null);
+	const [recordingDurationInputValue, setRecordingDurationInputValue] = useState("");
+	const isRecordingDurationInputValueCorrect = recordingDurationSchema.safeParse(
+		recordingDurationInputValue,
+	).success;
 
 	const queryClient = useQueryClient();
 	const { data: config } = useConfig();
@@ -46,10 +51,14 @@ const Settings = () => {
 		onSuccess: (newConfig) => queryClient.setQueryData(CONFIG_QUERY_KEY, newConfig),
 	});
 
-	const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-		const inputValue = recordingDurationInputRef.current?.value;
+	useEffect(() => {
+		if (config) {
+			setRecordingDurationInputValue(config.recording_duration_in_secs.toString());
+		}
+	}, [config]);
 
-		const parsedValue = z.coerce.number().int().min(1).max(600).safeParse(inputValue);
+	const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+		const parsedValue = recordingDurationSchema.safeParse(recordingDurationInputValue);
 
 		if (parsedValue.success) {
 			changeRecordingDuration(parsedValue.data);
@@ -78,22 +87,28 @@ const Settings = () => {
 				{pressed && <p>Listening for keyboard input</p>}
 			</div>
 
-			{config ? (
-				<form className="flex h-10 w-2/3 items-center gap-4" onSubmit={handleFormSubmit}>
-					<Label htmlFor="recording_duration">Recording duration in seconds</Label>
+			<form className="flex h-10 items-center gap-4" onSubmit={handleFormSubmit}>
+				<Label htmlFor="recording_duration">Recording duration in seconds</Label>
+				{true ? (
 					<Input
-						ref={recordingDurationInputRef}
+						onChange={(e) => setRecordingDurationInputValue(e.currentTarget.value)}
+						value={recordingDurationInputValue}
 						id="recording_duration"
 						className="w-20"
-						defaultValue={config.recording_duration_in_secs}
 					/>
-					<Button disabled={isRecordingDurationLoading} type="submit">
-						Save
-					</Button>
-				</form>
-			) : (
-				<Skeleton className="h-10 w-2/3" />
-			)}
+				) : (
+					<Skeleton className="h-10 w-20" />
+				)}
+				<Button
+					disabled={isRecordingDurationLoading || !isRecordingDurationInputValueCorrect}
+					type="submit"
+				>
+					Save
+				</Button>
+				{!isRecordingDurationInputValueCorrect && (
+					<p className="text-sm">Value must be integer between 1 and 600</p>
+				)}
+			</form>
 
 			<div className="flex h-10 items-center gap-4">
 				<p className="text-xl font-semibold tracking-tight">Save directory</p>
