@@ -69,3 +69,16 @@
 	background-clip: padding-box;
 	border-radius: 0.84rem;
 }
+
+@keyframes slideAnimation {
+	from {
+		transform: translateX(-100%);
+	}
+	to {
+		transform: translateX(0);
+	}
+}
+
+.progress-animation {
+	animation: slideAnimation linear forwards;
+}

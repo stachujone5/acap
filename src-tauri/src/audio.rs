@@ -82,7 +82,10 @@ pub fn record_audio() -> Result<(), String> {
     stream.play().map_err(|_| "Failed to play audio stream")?;
 
     // Let recording go for roughly three seconds.
-    std::thread::sleep(std::time::Duration::from_secs(3));
+    std::thread::sleep(std::time::Duration::from_secs(
+        config_file.recording_duration_in_secs.into(),
+    ));
+
     drop(stream);
     writer
         .lock()

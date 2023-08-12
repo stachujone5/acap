@@ -39,7 +39,7 @@ const Settings = () => {
 	return (
 		<div className="flex flex-col gap-6">
 			<div className="flex items-center gap-4">
-				<h3 className="text-2xl font-semibold tracking-tight">Start recording</h3>
+				<p className="text-2xl font-semibold tracking-tight">Start recording</p>
 				<Toggle
 					pressed={pressed}
 					onPressedChange={(isPressed) => setPressed(isPressed)}
@@ -53,9 +53,7 @@ const Settings = () => {
 			</div>
 
 			<div className="flex items-center gap-4">
-				<Button onClick={() => mutate()} className="w-fit">
-					Change save directory
-				</Button>
+				<Button onClick={() => mutate()}>Change save directory</Button>
 				{data ? (
 					<p>{data.save_path}</p>
 				) : (
@@ -64,7 +62,7 @@ const Settings = () => {
 					</Skeleton>
 				)}
 			</div>
-			{	data ? (
+			{data ? (
 				<p>Recording duration: {data.recording_duration_in_secs} seconds</p>
 			) : (
 				<Skeleton className="w-1/3">

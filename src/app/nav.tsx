@@ -38,32 +38,31 @@ export const Nav = () => {
 	const { setTheme } = useTheme();
 
 	return (
-		<NavigationMenuPrimitive.Root className="relative z-10 flex items-center border-b pb-2 px-2">
-			<NavigationMenuPrimitive.List className="group flex flex-1 list-none items-center justify-center space-x-1">
-				<NavigationMenuPrimitive.Item>
-					<Link href="/">Home</Link>
-				</NavigationMenuPrimitive.Item>
-				<NavigationMenuPrimitive.Item>
-					<Link href="/recordings">Recordings</Link>
-				</NavigationMenuPrimitive.Item>
-				<NavigationMenuPrimitive.Item>
-					<Link href="/settings">Settings</Link>
-				</NavigationMenuPrimitive.Item>
-			</NavigationMenuPrimitive.List>
+		<div className="px-2">
+			<NavigationMenuPrimitive.Root className="z-10 flex items-center justify-between border-b pb-2">
+				<NavigationMenuPrimitive.List className="group flex flex-1 list-none items-center justify-center space-x-1">
+					<NavigationMenuPrimitive.Item>
+						<Link href="/">Recordings</Link>
+					</NavigationMenuPrimitive.Item>
+					<NavigationMenuPrimitive.Item>
+						<Link href="/settings">Settings</Link>
+					</NavigationMenuPrimitive.Item>
+				</NavigationMenuPrimitive.List>
 
-			<DropdownMenu>
-				<DropdownMenuTrigger asChild>
-					<Button variant="outline" size="icon" className="absolute right-0 top-0">
-						<Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-						<Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-					</Button>
-				</DropdownMenuTrigger>
-				<DropdownMenuContent align="end">
-					<DropdownMenuItem onClick={() => setTheme("light")}>Light</DropdownMenuItem>
-					<DropdownMenuItem onClick={() => setTheme("dark")}>Dark</DropdownMenuItem>
-					<DropdownMenuItem onClick={() => setTheme("system")}>System</DropdownMenuItem>
-				</DropdownMenuContent>
-			</DropdownMenu>
-		</NavigationMenuPrimitive.Root>
+				<DropdownMenu>
+					<DropdownMenuTrigger asChild>
+						<Button variant="outline" size="icon">
+							<Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+							<Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+						</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent align="end">
+						<DropdownMenuItem onClick={() => setTheme("light")}>Light</DropdownMenuItem>
+						<DropdownMenuItem onClick={() => setTheme("dark")}>Dark</DropdownMenuItem>
+						<DropdownMenuItem onClick={() => setTheme("system")}>System</DropdownMenuItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
+			</NavigationMenuPrimitive.Root>
+		</div>
 	);
 };
