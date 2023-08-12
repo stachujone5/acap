@@ -8,6 +8,7 @@ use std::path::PathBuf;
 
 use config::Config;
 use specta::collect_types;
+use tauri::{CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu};
 use tauri_specta::ts;
 
 #[tauri::command]
@@ -30,6 +31,12 @@ fn set_config_save_path(save_path: PathBuf) -> Config {
 }
 
 fn main() {
+    // Tray menu
+    let quit = CustomMenuItem::new("quit", "Quit");
+    let tray_menu = SystemTrayMenu::new().add_item(quit);
+
+    let tray = SystemTray::new().with_menu(tray_menu);
+
     // Export types from rust functions into typescript file
     ts::export(
         collect_types![
@@ -46,12 +53,28 @@ fn main() {
     Config::new();
 
     tauri::Builder::default()
+        .system_tray(tray)
+        .on_system_tray_event(|app, event| match event {
+            SystemTrayEvent::LeftClick { .. } => app.get_window("main").unwrap().show().unwrap(),
+            SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
+                "quit" => app.exit(0),
+                _ => {}
+            },
+            _ => {}
+        })
         .invoke_handler(tauri::generate_handler![
             audio::record_audio,
             get_config,
             set_config_save_path,
             config::get_acap_files
         ])
+        .on_window_event(|event| match event.event() {
+            tauri::WindowEvent::CloseRequested { api, .. } => {
+                event.window().hide().unwrap();
+                api.prevent_close();
+            }
+            _ => {}
+        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

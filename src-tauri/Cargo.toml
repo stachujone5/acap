@@ -15,7 +15,7 @@ rust-version = "1.60"
 tauri-build = { version = "1.4.0", features = [] }
 
 [dependencies]
-tauri = { version = "1.4.0", features = [ "path-all", "dialog-open", "protocol-asset"] }
+tauri = { version = "1.4.0", features = [ "system-tray", "path-all", "dialog-open", "protocol-asset"] }
 cpal = "0.15.2"
 hound = "3.5.0"
 specta = "1.0.5"
@@ -23,7 +23,6 @@ tauri-specta = { version = "1.0.2", features = ["typescript"] }
 serde = "1.0.183"
 directories = "5.0"
 toml = "0.7.6"
-crossterm = "0.27.0"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem and the built-in dev server is disabled.
