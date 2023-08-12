@@ -13,6 +13,13 @@ pub struct Config {
     pub recording_duration_in_secs: u32,
 }
 
+#[derive(Serialize, Deserialize, Type)]
+pub enum ConfigKey {
+    ConfigFilePath(PathBuf),
+    SavePath(PathBuf),
+    RecordingDurationInSecs(u32),
+}
+
 impl Config {
     // Attempts find a default project's directory and returns a default config
     pub fn default() -> Self {
@@ -54,13 +61,26 @@ impl Config {
         config
     }
 
-    // Sets the project's config
-    pub fn set_config(config: Config) -> Config {
+    // Saves the project's config
+    pub fn save_config(config: Config) -> Config {
         let toml = toml::to_string(&config).unwrap();
 
         fs::write(Self::default().config_file_path, toml).unwrap();
 
         config
+    }
+
+    // Updates a key in config and saves the new config
+    pub fn update_key(key: ConfigKey) -> Config {
+        let mut config = Self::get_config();
+
+        match key {
+            ConfigKey::SavePath(value) => config.save_path = value,
+            ConfigKey::RecordingDurationInSecs(value) => config.recording_duration_in_secs = value,
+            ConfigKey::ConfigFilePath(value) => config.config_file_path = value,
+        }
+
+        Self::save_config(config)
     }
 }
 

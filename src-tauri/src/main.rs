@@ -4,9 +4,7 @@
 mod audio;
 mod config;
 
-use std::path::PathBuf;
-
-use config::Config;
+use config::{Config, ConfigKey};
 use specta::collect_types;
 use tauri::{CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu};
 use tauri_specta::ts;
@@ -19,15 +17,8 @@ fn get_config() -> Config {
 
 #[tauri::command]
 #[specta::specta]
-fn set_config_save_path(save_path: PathBuf) -> Config {
-    let config = Config::get_config();
-
-    let config = Config::set_config(Config {
-        save_path,
-        ..config
-    });
-
-    config
+fn update_config_key(key: ConfigKey) -> Config {
+    Config::update_key(key)
 }
 
 fn main() {
@@ -42,7 +33,7 @@ fn main() {
         collect_types![
             audio::record_audio,
             get_config,
-            set_config_save_path,
+            update_config_key,
             config::get_acap_files,
         ],
         "../src/utils/bindings.ts",
@@ -65,7 +56,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             audio::record_audio,
             get_config,
-            set_config_save_path,
+            update_config_key,
             config::get_acap_files
         ])
         .on_window_event(|event| match event.event() {
