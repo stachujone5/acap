@@ -4,7 +4,9 @@
 mod audio;
 mod config;
 
-use config::{Config, ConfigKey};
+use std::panic;
+
+use config::{Config, ConfigUpdatableKey};
 use specta::collect_types;
 use tauri::{CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu};
 use tauri_specta::ts;
@@ -17,7 +19,7 @@ fn get_config() -> Config {
 
 #[tauri::command]
 #[specta::specta]
-fn update_config_key(key: ConfigKey) -> Config {
+fn update_config_key(key: ConfigUpdatableKey) -> Config {
     Config::update_key(key)
 }
 
@@ -34,14 +36,18 @@ fn main() {
             audio::record_audio,
             get_config,
             update_config_key,
-            config::get_acap_files,
+            audio::get_acap_files,
         ],
         "../src/utils/bindings.ts",
     )
     .expect("Failed to export ts bindings");
 
-    // Attempt to create a config.toml in project's directory or terminate the process
-    Config::new();
+    // Create a new config if there is no config.toml in the project's directory
+    let config = panic::catch_unwind(|| Config::get_config());
+
+    if let Err(_) = config {
+        Config::new();
+    }
 
     tauri::Builder::default()
         .system_tray(tray)
@@ -57,7 +63,7 @@ fn main() {
             audio::record_audio,
             get_config,
             update_config_key,
-            config::get_acap_files
+            audio::get_acap_files
         ])
         .on_window_event(|event| match event.event() {
             tauri::WindowEvent::CloseRequested { api, .. } => {

@@ -7,6 +7,8 @@ import { useConfig } from "@/utils/useConfig";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { convertFileSrc } from "@tauri-apps/api/tauri";
 import * as ProgressPrimitive from "@radix-ui/react-progress";
+import { useEffect } from "react";
+import { useTheme } from "next-themes";
 
 const getRecordings = async () => {
 	const acapFiles = await getAcapFiles();
@@ -23,6 +25,7 @@ const getRecordings = async () => {
 
 const Recordings = () => {
 	const queryClient = useQueryClient();
+	const { setTheme } = useTheme();
 	const { data: config } = useConfig();
 	const { data: recordings } = useQuery({
 		queryKey: ["recordings"],
@@ -33,6 +36,12 @@ const Recordings = () => {
 		mutationFn: recordAudio,
 		onSuccess: () => queryClient.invalidateQueries(["recordings"]),
 	});
+
+	useEffect(() => {
+		if (config) {
+			setTheme(config.theme);
+		}
+	}, [config, setTheme]);
 
 	if (recordings && recordings.length === 0 && !isLoading) {
 		return (
@@ -62,7 +71,7 @@ const Recordings = () => {
 						<ProgressPrimitive.Root className="relative h-[100px] overflow-hidden rounded-md border">
 							<ProgressPrimitive.Indicator
 								className="progress-animation h-full w-full flex-1 animate-pulse rounded-md bg-muted transition-all"
-								style={{ animationDuration: `${config.recording_duration_in_secs}s` }}
+								style={{ animationDuration: `${config.recordingDurationInSecs}s` }}
 							/>
 						</ProgressPrimitive.Root>
 					</div>

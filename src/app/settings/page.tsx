@@ -7,14 +7,13 @@ import { dialog } from "@tauri-apps/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateConfigKey } from "@/utils/bindings";
 import { CONFIG_QUERY_KEY, useConfig } from "@/utils/useConfig";
-import { Skeleton } from "@/ui/skeleton";
 import { Input } from "@/ui/input";
 import { Label } from "@/ui/label";
 import { z } from "zod";
 
 const recordingDurationSchema = z.coerce.number().int().min(1).max(600);
 
-const handleSavePathChange = async () => {
+const changeSavePathMutation = async () => {
 	const pathSelectedByUser = await dialog.open({
 		directory: true,
 	});
@@ -23,11 +22,11 @@ const handleSavePathChange = async () => {
 		throw new Error("Invalid files / folders selected!");
 	}
 
-	return updateConfigKey({ SavePath: pathSelectedByUser });
+	return updateConfigKey({ savePath: pathSelectedByUser });
 };
 
-const handleRecordingDurationChange = (newRecordingDuration: number) => {
-	return updateConfigKey({ RecordingDurationInSecs: newRecordingDuration });
+const changeRecordingDurationMutation = (recordingDurationInSecs: number) => {
+	return updateConfigKey({ recordingDurationInSecs });
 };
 
 const Settings = () => {
@@ -39,21 +38,21 @@ const Settings = () => {
 	).success;
 
 	const queryClient = useQueryClient();
-	const { data: config } = useConfig();
+	const { data: config, isLoading: isConfigLoading, isError: isConfigError } = useConfig();
 
 	const { mutate: changeSavePath } = useMutation({
-		mutationFn: handleSavePathChange,
+		mutationFn: changeSavePathMutation,
 		onSuccess: (newConfig) => queryClient.setQueryData(CONFIG_QUERY_KEY, newConfig),
 	});
 
 	const { mutate: changeRecordingDuration, isLoading: isRecordingDurationLoading } = useMutation({
-		mutationFn: handleRecordingDurationChange,
+		mutationFn: changeRecordingDurationMutation,
 		onSuccess: (newConfig) => queryClient.setQueryData(CONFIG_QUERY_KEY, newConfig),
 	});
 
 	useEffect(() => {
 		if (config) {
-			setRecordingDurationInputValue(config.recording_duration_in_secs.toString());
+			setRecordingDurationInputValue(config.recordingDurationInSecs.toString());
 		}
 	}, [config]);
 
@@ -70,6 +69,10 @@ const Settings = () => {
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
 		setKey(e.key);
 	};
+
+	if (!config) {
+		return null;
+	}
 
 	return (
 		<div className="flex flex-col gap-6">
@@ -89,16 +92,13 @@ const Settings = () => {
 
 			<form className="flex h-10 items-center gap-4" onSubmit={handleFormSubmit}>
 				<Label htmlFor="recording_duration">Recording duration in seconds</Label>
-				{true ? (
-					<Input
-						onChange={(e) => setRecordingDurationInputValue(e.currentTarget.value)}
-						value={recordingDurationInputValue}
-						id="recording_duration"
-						className="w-20"
-					/>
-				) : (
-					<Skeleton className="h-10 w-20" />
-				)}
+				<Input
+					onChange={(e) => setRecordingDurationInputValue(e.currentTarget.value)}
+					value={recordingDurationInputValue}
+					id="recording_duration"
+					className="w-20"
+				/>
+
 				<Button
 					disabled={isRecordingDurationLoading || !isRecordingDurationInputValueCorrect}
 					type="submit"
@@ -113,13 +113,9 @@ const Settings = () => {
 			<div className="flex h-10 items-center gap-4">
 				<p className="text-xl font-semibold tracking-tight">Save directory</p>
 
-				{config ? (
-					<p className="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium">
-						{config.save_path}
-					</p>
-				) : (
-					<Skeleton className="h-10 w-1/3" />
-				)}
+				<p className="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium">
+					{config.savePath}
+				</p>
 
 				<Button disabled={!Boolean(config)} onClick={() => changeSavePath()}>
 					Change

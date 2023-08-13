@@ -18,7 +18,7 @@ export function getConfig() {
     return invoke()<Config>("get_config")
 }
 
-export function updateConfigKey(key: ConfigKey) {
+export function updateConfigKey(key: ConfigUpdatableKey) {
     return invoke()<Config>("update_config_key", { key })
 }
 
@@ -26,6 +26,7 @@ export function getAcapFiles() {
     return invoke()<AcapFile[]>("get_acap_files")
 }
 
-export type ConfigKey = { ConfigFilePath: string } | { SavePath: string } | { RecordingDurationInSecs: number }
-export type Config = { config_file_path: string; save_path: string; recording_duration_in_secs: number }
+export type ConfigUpdatableKey = { savePath: string } | { recordingDurationInSecs: number } | { theme: Theme }
+export type Theme = "system" | "light" | "dark"
+export type Config = { configFilePath: string; savePath: string; recordingDurationInSecs: number; theme: Theme }
 export type AcapFile = { name: string; path: string }

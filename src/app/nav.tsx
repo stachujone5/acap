@@ -12,6 +12,8 @@ import {
 } from "@/ui/dropdown-menu";
 import { Button } from "@/ui/button";
 import { usePathname } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
+import { Theme, updateConfigKey } from "@/utils/bindings";
 
 interface LinkProps {
 	children: React.ReactNode;
@@ -37,6 +39,10 @@ const Link = ({ href, children }: LinkProps) => {
 export const Nav = () => {
 	const { setTheme } = useTheme();
 
+	const { mutate: updateThemeConfig } = useMutation({
+		mutationFn: (theme: Theme) => updateConfigKey({ theme }),
+	});
+
 	return (
 		<div className="px-2">
 			<NavigationMenuPrimitive.Root className="z-10 flex items-center justify-between border-b pb-2">
@@ -57,9 +63,30 @@ export const Nav = () => {
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="end">
-						<DropdownMenuItem onClick={() => setTheme("light")}>Light</DropdownMenuItem>
-						<DropdownMenuItem onClick={() => setTheme("dark")}>Dark</DropdownMenuItem>
-						<DropdownMenuItem onClick={() => setTheme("system")}>System</DropdownMenuItem>
+						<DropdownMenuItem
+							onClick={() => {
+								setTheme("light");
+								updateThemeConfig("light");
+							}}
+						>
+							Light
+						</DropdownMenuItem>
+						<DropdownMenuItem
+							onClick={() => {
+								setTheme("dark");
+								updateThemeConfig("dark");
+							}}
+						>
+							Dark
+						</DropdownMenuItem>
+						<DropdownMenuItem
+							onClick={() => {
+								setTheme("system");
+								updateThemeConfig("system");
+							}}
+						>
+							System
+						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</NavigationMenuPrimitive.Root>

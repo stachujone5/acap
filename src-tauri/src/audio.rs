@@ -1,8 +1,11 @@
 use crate::config::Config;
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use cpal::{FromSample, Sample};
-use std::fs::File;
+use serde::{Deserialize, Serialize};
+use specta::Type;
+use std::fs::{self, File};
 use std::io::BufWriter;
+use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 use std::time::SystemTime;
 
@@ -131,4 +134,35 @@ where
             }
         }
     }
+}
+
+#[derive(Serialize, Deserialize, Type)]
+pub struct AcapFile {
+    name: String,
+    path: PathBuf,
+}
+
+// Returns all .wav files living in the project's directory or throws
+#[tauri::command]
+#[specta::specta]
+pub fn get_acap_files() -> Result<Vec<AcapFile>, ()> {
+    let config: Config = Config::get_config();
+
+    let all_files = fs::read_dir(config.save_path).map_err(|_| ())?;
+
+    let acap_files = all_files
+        .filter_map(|entry| {
+            let entry = entry.ok()?;
+            let path = entry.path();
+            let name = entry.file_name().to_str()?.to_string();
+
+            if path.is_file() && path.extension().map(|ext| ext == "wav").unwrap_or(false) {
+                Some(AcapFile { name, path })
+            } else {
+                None
+            }
+        })
+        .collect();
+
+    Ok(acap_files)
 }
