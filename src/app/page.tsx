@@ -32,7 +32,7 @@ const Recordings = () => {
 		queryFn: getRecordings,
 	});
 
-	const { mutate: startRecording, isLoading } = useMutation({
+	const { mutate: startRecording, isLoading: isRecording } = useMutation({
 		mutationFn: recordAudio,
 		onSuccess: () => queryClient.invalidateQueries(["recordings"]),
 	});
@@ -43,11 +43,11 @@ const Recordings = () => {
 		}
 	}, [config, setTheme]);
 
-	if (recordings && recordings.length === 0 && !isLoading) {
+	if (recordings && recordings.length === 0 && !isRecording) {
 		return (
 			<div className="flex h-full flex-col items-center justify-center gap-4">
 				<p className="text-2xl font-semibold tracking-tight">No recordings found!</p>
-				<Button disabled={isLoading} onClick={() => startRecording()}>
+				<Button disabled={isRecording} onClick={() => startRecording()}>
 					Record something
 				</Button>
 			</div>
@@ -58,7 +58,7 @@ const Recordings = () => {
 		<div className="flex h-full flex-col gap-4">
 			<div className="flex items-center gap-4">
 				{config ? (
-					<Button className="h-10 w-40" disabled={isLoading} onClick={() => startRecording()}>
+					<Button className="h-10 w-40" disabled={isRecording} onClick={() => startRecording()}>
 						Record new audio
 					</Button>
 				) : (
@@ -66,7 +66,7 @@ const Recordings = () => {
 				)}
 			</div>
 			<div className="flex flex-grow flex-col gap-4 overflow-y-auto">
-				{isLoading && config && (
+				{isRecording && config && (
 					<div>
 						<ProgressPrimitive.Root className="relative h-[100px] overflow-hidden rounded-md border">
 							<ProgressPrimitive.Indicator
