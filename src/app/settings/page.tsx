@@ -2,7 +2,7 @@
 
 import { Button } from "@/ui/button";
 import { Toggle } from "@/ui/toggle";
-import { KeyboardEvent, ModifierKey, useEffect, useState } from "react";
+import { KeyboardEvent, useEffect, useState } from "react";
 import { dialog } from "@tauri-apps/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateConfigKey } from "@/utils/bindings";
@@ -32,8 +32,8 @@ const changeRecordingDurationFn = (recordingDurationInSecs: number) => {
 	return updateConfigKey({ recordingDurationInSecs });
 };
 
-const changeStartRecordingHotkeyFn = (hotkey: string) => {
-	return updateConfigKey({ startRecordingHotkey: hotkey });
+const changeStartRecordingKey = (startRecordingKey: string) => {
+	return updateConfigKey({ startRecordingKey: startRecordingKey });
 };
 
 const Settings = () => {
@@ -46,11 +46,10 @@ const Settings = () => {
 		resolver: zodResolver(recordingDurationFormSchema),
 		mode: "onChange",
 	});
-
-	const [pressed, setPressed] = useState(false);
-
 	const queryClient = useQueryClient();
 	const { data: config } = useConfig();
+
+	const [pressed, setPressed] = useState(false);
 
 	const { mutate: changeSavePathMutation } = useMutation({
 		mutationFn: changeSavePathFn,
@@ -63,8 +62,8 @@ const Settings = () => {
 			onSuccess: (newConfig) => queryClient.setQueryData(CONFIG_QUERY_KEY, newConfig),
 		});
 
-	const { mutate: changeStartRecordingHotkeyMutation } = useMutation({
-		mutationFn: changeStartRecordingHotkeyFn,
+	const { mutate: changestartRecordingKeyMutation } = useMutation({
+		mutationFn: changeStartRecordingKey,
 		onSuccess: (newConfig) => queryClient.setQueryData(CONFIG_QUERY_KEY, newConfig),
 	});
 
@@ -76,27 +75,29 @@ const Settings = () => {
 
 	const handleKeyDown = (e: KeyboardEvent<HTMLButtonElement>) => {
 		e.preventDefault();
-		setPressed(true);
 
-		const modifierKeys: ModifierKey[] = [
-			"Control",
-			"Alt",
-			"Shift",
-			"Meta",
-			"CapsLock",
-			"AltGraph",
-			"Fn",
+		const functionKeys: string[] = [
+			"F1",
+			"F2",
+			"F3",
+			"F4",
+			"F5",
+			"F6",
+			"F7",
+			"F8",
+			"F9",
+			"F10",
+			"F11",
+			"F12",
 		];
 
-		const pressedModifier = modifierKeys.find((key) => e.getModifierState(key));
+		const pressedFunctionKey = functionKeys.find((key) => key === e.key);
 
-		if (!pressedModifier) {
+		if (!pressedFunctionKey) {
 			return;
 		}
 
-		if (e.key !== pressedModifier && e.code !== "Space") {
-			changeStartRecordingHotkeyMutation(`${pressedModifier} + ${e.key}`);
-		}
+		changestartRecordingKeyMutation(pressedFunctionKey);
 	};
 
 	const onRecordingDurationFormSubmit = (data: z.infer<typeof recordingDurationFormSchema>) => {
@@ -114,9 +115,10 @@ const Settings = () => {
 						onBlur={() => setPressed(false)}
 						variant="outline"
 						onKeyDown={handleKeyDown}
-						onKeyUp={() => setPressed(false)}
 					>
-						<div className="flex items-center justify-center">{config.startRecordingHotkey}</div>
+						<div className="flex items-center justify-center">
+							{config.startRecordingKey}
+						</div>
 					</Toggle>
 				) : (
 					<Skeleton className="h-10 w-20" />

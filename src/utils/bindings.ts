@@ -26,7 +26,7 @@ export function getAcapFiles() {
     return invoke()<AcapFile[]>("get_acap_files")
 }
 
-export type ConfigUpdatableKey = { savePath: string } | { recordingDurationInSecs: number } | { theme: Theme } | { startRecordingHotkey: string }
+export type ConfigUpdatableKey = { savePath: string } | { recordingDurationInSecs: number } | { theme: Theme } | { startRecordingKey: string }
 export type Theme = "system" | "light" | "dark"
-export type Config = { configFilePath: string; savePath: string; recordingDurationInSecs: number; theme: Theme; startRecordingHotkey: string }
+export type Config = { configFilePath: string; savePath: string; recordingDurationInSecs: number; theme: Theme; startRecordingKey: string }
 export type AcapFile = { name: string; path: string }
