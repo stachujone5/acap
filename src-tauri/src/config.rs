@@ -20,6 +20,7 @@ pub struct Config {
     pub save_path: PathBuf,
     pub recording_duration_in_secs: u32,
     pub theme: Theme,
+    pub start_recording_hotkey: String,
 }
 
 // Keys that can be updated from the frontend
@@ -29,6 +30,7 @@ pub enum ConfigUpdatableKey {
     SavePath(PathBuf),
     RecordingDurationInSecs(u32),
     Theme(Theme),
+    StartRecordingHotkey(String),
 }
 
 impl Config {
@@ -49,6 +51,7 @@ impl Config {
             recording_duration_in_secs: 30,
             config_file_path: project_dir.clone().join("config.toml"),
             theme: Theme::System,
+            start_recording_hotkey: "Control+PageDown".to_string(),
         }
     }
 
@@ -100,6 +103,9 @@ impl Config {
                 config.recording_duration_in_secs = value
             }
             ConfigUpdatableKey::Theme(value) => config.theme = value,
+            ConfigUpdatableKey::StartRecordingHotkey(value) => {
+                config.start_recording_hotkey = value
+            }
         }
 
         Self::save_config(config)
