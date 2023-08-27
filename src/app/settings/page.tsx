@@ -5,7 +5,7 @@ import { Toggle } from "@/ui/toggle";
 import { KeyboardEvent, useEffect, useState } from "react";
 import { dialog } from "@tauri-apps/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateConfigKey } from "@/utils/bindings";
+import { FunctionKey, updateConfig } from "@/utils/bindings";
 import { CONFIG_QUERY_KEY, useConfig } from "@/utils/useConfig";
 import { Input } from "@/ui/input";
 import { Label } from "@/ui/label";
@@ -17,23 +17,23 @@ import { z } from "zod";
 const recordingDurationFormSchema = z.object({ duration: z.coerce.number().int().min(1).max(600) });
 
 const changeSavePathFn = async () => {
-	const pathSelectedByUser = await dialog.open({
+	const savePath = await dialog.open({
 		directory: true,
 	});
 
-	if (typeof pathSelectedByUser !== "string") {
+	if (typeof savePath !== "string") {
 		throw new Error("Invalid files / folders selected!");
 	}
 
-	return updateConfigKey({ savePath: pathSelectedByUser });
+	return updateConfig({ savePath });
 };
 
 const changeRecordingDurationFn = (recordingDurationInSecs: number) => {
-	return updateConfigKey({ recordingDurationInSecs });
+	return updateConfig({ recordingDurationInSecs });
 };
 
-const changeStartRecordingKey = (startRecordingKey: string) => {
-	return updateConfigKey({ startRecordingKey: startRecordingKey });
+const changeStartRecordingKey = (startRecordingKey: FunctionKey) => {
+	return updateConfig({ startRecordingKey: startRecordingKey });
 };
 
 const Settings = () => {
@@ -76,7 +76,7 @@ const Settings = () => {
 	const handleKeyDown = (e: KeyboardEvent<HTMLButtonElement>) => {
 		e.preventDefault();
 
-		const functionKeys: string[] = [
+		const functionKeys: FunctionKey[] = [
 			"F1",
 			"F2",
 			"F3",
@@ -107,7 +107,7 @@ const Settings = () => {
 	return (
 		<div className="flex flex-col gap-6">
 			<div className="flex items-center gap-4">
-				<p className="text-xl font-semibold tracking-tight">Start recording hotkey</p>
+				<p className="text-xl font-semibold tracking-tight">Start recording key</p>
 				{config ? (
 					<Toggle
 						pressed={pressed}
@@ -116,15 +116,13 @@ const Settings = () => {
 						variant="outline"
 						onKeyDown={handleKeyDown}
 					>
-						<div className="flex items-center justify-center">
-							{config.startRecordingKey}
-						</div>
+						<div className="flex items-center justify-center">{config.startRecordingKey}</div>
 					</Toggle>
 				) : (
 					<Skeleton className="h-10 w-20" />
 				)}
 
-				{pressed && <p>Listening for keyboard input</p>}
+				{pressed && <p>Listening for F1-F12 key press</p>}
 			</div>
 
 			<form

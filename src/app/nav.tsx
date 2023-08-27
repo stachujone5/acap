@@ -13,7 +13,7 @@ import {
 import { Button } from "@/ui/button";
 import { usePathname } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
-import { Theme, updateConfigKey } from "@/utils/bindings";
+import { Theme, updateConfig } from "@/utils/bindings";
 
 interface LinkProps {
 	children: React.ReactNode;
@@ -40,7 +40,7 @@ export const Nav = () => {
 	const { setTheme } = useTheme();
 
 	const { mutate: updateThemeConfig } = useMutation({
-		mutationFn: (theme: Theme) => updateConfigKey({ theme }),
+		mutationFn: (theme: Theme) => updateConfig({ theme }),
 	});
 
 	return (

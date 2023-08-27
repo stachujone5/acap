@@ -10,23 +10,20 @@ declare global {
 // Function avoids 'window not defined' in SSR
 const invoke = () => window.__TAURI_INVOKE__;
 
-export function recordAudio() {
-    return invoke()<null>("record_audio")
-}
-
 export function getConfig() {
     return invoke()<Config>("get_config")
 }
 
-export function updateConfigKey(key: ConfigUpdatableKey) {
-    return invoke()<Config>("update_config_key", { key })
+export function updateConfig(key: ConfigUpdatableKey) {
+    return invoke()<Config>("update_config", { key })
 }
 
 export function getAcapFiles() {
     return invoke()<AcapFile[]>("get_acap_files")
 }
 
-export type ConfigUpdatableKey = { savePath: string } | { recordingDurationInSecs: number } | { theme: Theme } | { startRecordingKey: string }
 export type Theme = "system" | "light" | "dark"
-export type Config = { configFilePath: string; savePath: string; recordingDurationInSecs: number; theme: Theme; startRecordingKey: string }
 export type AcapFile = { name: string; path: string }
+export type Config = { configFilePath: string; savePath: string; recordingDurationInSecs: number; theme: Theme; startRecordingKey: FunctionKey }
+export type FunctionKey = "F1" | "F2" | "F3" | "F4" | "F5" | "F6" | "F7" | "F8" | "F9" | "F10" | "F11" | "F12"
+export type ConfigUpdatableKey = { savePath: string } | { recordingDurationInSecs: number } | { theme: Theme } | { startRecordingKey: FunctionKey }

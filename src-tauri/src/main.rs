@@ -4,8 +4,6 @@
 mod audio;
 mod config;
 
-use std::panic;
-
 use config::{Config, ConfigUpdatableKey};
 use specta::collect_types;
 use tauri::{CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu};
@@ -13,14 +11,21 @@ use tauri_specta::ts;
 
 #[tauri::command]
 #[specta::specta]
-fn get_config() -> Config {
-    Config::get_config()
+fn get_config(config: tauri::State<'_, Config>) -> Config {
+    config.get_config()
 }
 
 #[tauri::command]
 #[specta::specta]
-fn update_config_key(key: ConfigUpdatableKey) -> Config {
-    Config::update_key(key)
+fn update_config(key: ConfigUpdatableKey, config: tauri::State<'_, Config>) -> Config {
+    config.update_config(|config| match &key {
+        ConfigUpdatableKey::SavePath(val) => config.save_path = val.to_owned(),
+        ConfigUpdatableKey::RecordingDurationInSecs(val) => {
+            config.recording_duration_in_secs = val.to_owned()
+        }
+        ConfigUpdatableKey::Theme(val) => config.theme = val.to_owned(),
+        ConfigUpdatableKey::StartRecordingKey(val) => config.start_recording_key = val.to_owned(),
+    })
 }
 
 fn main() {
@@ -32,24 +37,15 @@ fn main() {
 
     // Export types from rust functions into typescript file
     ts::export(
-        collect_types![
-            audio::record_audio,
-            get_config,
-            update_config_key,
-            audio::get_acap_files,
-        ],
+        collect_types![get_config, update_config, audio::get_acap_files],
         "../src/utils/bindings.ts",
     )
     .expect("Failed to export ts bindings");
 
-    // Create a new config if there is no config.toml in the project's directory
-    let config = panic::catch_unwind(|| Config::get_config());
-
-    if let Err(_) = config {
-        Config::new();
-    }
+    let config = Config::new();
 
     tauri::Builder::default()
+        .manage(config)
         .system_tray(tray)
         .on_system_tray_event(|app, event| match event {
             SystemTrayEvent::LeftClick { .. } => app.get_window("main").unwrap().show().unwrap(),
@@ -60,9 +56,8 @@ fn main() {
             _ => {}
         })
         .invoke_handler(tauri::generate_handler![
-            audio::record_audio,
             get_config,
-            update_config_key,
+            update_config,
             audio::get_acap_files
         ])
         .on_window_event(|event| match event.event() {

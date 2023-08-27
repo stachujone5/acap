@@ -2,7 +2,7 @@
 
 import { Button } from "@/ui/button";
 import { Skeleton } from "@/ui/skeleton";
-import { getAcapFiles, recordAudio } from "@/utils/bindings";
+import { getAcapFiles } from "@/utils/bindings";
 import { useConfig } from "@/utils/useConfig";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { convertFileSrc } from "@tauri-apps/api/tauri";
@@ -33,7 +33,12 @@ const Recordings = () => {
 	});
 
 	const { mutate: startRecording, isLoading: isRecording } = useMutation({
-		mutationFn: recordAudio,
+		mutationFn: () =>
+			new Promise((resolve) => {
+				setTimeout(() => {
+					resolve(null);
+				}, 30000);
+			}),
 		onSuccess: () => queryClient.invalidateQueries(["recordings"]),
 	});
 
