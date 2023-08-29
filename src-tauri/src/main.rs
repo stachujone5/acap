@@ -4,6 +4,8 @@
 mod audio;
 mod config;
 
+use std::thread;
+
 use config::{Config, ConfigUpdatableKey};
 use specta::collect_types;
 use tauri::{CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu};
@@ -26,6 +28,12 @@ fn update_config(key: ConfigUpdatableKey, config: tauri::State<'_, Config>) -> C
         ConfigUpdatableKey::Theme(val) => config.theme = val.to_owned(),
         ConfigUpdatableKey::StartRecordingKey(val) => config.start_recording_key = val.to_owned(),
     })
+}
+
+#[derive(Clone, serde::Serialize)]
+struct Payload {
+    mode: String,
+    message: String,
 }
 
 fn main() {
@@ -66,6 +74,25 @@ fn main() {
                 api.prevent_close();
             }
             _ => {}
+        })
+        .setup(move |app| {
+            let wv = app.get_window("main").unwrap();
+
+            thread::spawn(move || {
+                audio::run_listener(move |s: &str, s1: &str| {
+                    if let Err(err) = wv.emit(
+                        "keypress",
+                        Payload {
+                            mode: String::from(s),
+                            message: String::from(s1),
+                        },
+                    ) {
+                        eprintln!("Error while emitting event: {:?}", err);
+                    }
+                })
+            });
+
+            Ok(())
         })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

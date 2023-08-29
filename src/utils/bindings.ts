@@ -23,7 +23,7 @@ export function getAcapFiles() {
 }
 
 export type Theme = "system" | "light" | "dark"
-export type AcapFile = { name: string; path: string }
 export type Config = { configFilePath: string; savePath: string; recordingDurationInSecs: number; theme: Theme; startRecordingKey: FunctionKey }
 export type FunctionKey = "F1" | "F2" | "F3" | "F4" | "F5" | "F6" | "F7" | "F8" | "F9" | "F10" | "F11" | "F12"
+export type AcapFile = { name: string; path: string }
 export type ConfigUpdatableKey = { savePath: string } | { recordingDurationInSecs: number } | { theme: Theme } | { startRecordingKey: FunctionKey }

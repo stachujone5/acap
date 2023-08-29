@@ -1,4 +1,5 @@
 use crate::config::Config;
+use rdev::{listen, Event, EventType};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 use std::fs::{self};
@@ -10,6 +11,35 @@ pub struct AcapFile {
     path: PathBuf,
 }
 
+pub fn run_listener<F>(emit: F)
+where
+    F: Fn(&str, &str) + 'static,
+{
+    if let Err(error) = listen(move |event| callback(event, &emit)) {
+        println!("Error: {:?}", error)
+    }
+}
+
+fn callback<F: Fn(&str, &str)>(event: Event, emit: &F) {
+    match event.event_type {
+        EventType::KeyPress(key) => match key {
+            rdev::Key::F1 => emit("KeyPress", "F1"),
+            rdev::Key::F2 => emit("KeyPress", "F2"),
+            rdev::Key::F3 => emit("KeyPress", "F3"),
+            rdev::Key::F4 => emit("KeyPress", "F4"),
+            rdev::Key::F5 => emit("KeyPress", "F5"),
+            rdev::Key::F6 => emit("KeyPress", "F6"),
+            rdev::Key::F7 => emit("KeyPress", "F7"),
+            rdev::Key::F8 => emit("KeyPress", "F8"),
+            rdev::Key::F9 => emit("KeyPress", "F9"),
+            rdev::Key::F10 => emit("KeyPress", "F10"),
+            rdev::Key::F11 => emit("KeyPress", "F11"),
+            rdev::Key::F12 => emit("KeyPress", "F12"),
+            _ => (),
+        },
+        _ => (),
+    }
+}
 // Returns all .wav files living in the project's directory or throws
 #[tauri::command]
 #[specta::specta]
