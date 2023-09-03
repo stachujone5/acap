@@ -4,10 +4,9 @@
 mod audio;
 mod config;
 
-use std::thread;
-
 use config::{Config, ConfigUpdatableKey};
 use specta::collect_types;
+use std::thread;
 use tauri::{CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu};
 use tauri_specta::ts;
 
@@ -30,6 +29,12 @@ fn update_config(key: ConfigUpdatableKey, config: tauri::State<'_, Config>) -> C
     })
 }
 
+#[tauri::command(async)]
+#[specta::specta]
+fn record_main_audio(config: tauri::State<'_, Config>) {
+    audio::record_audio(config).unwrap();
+}
+
 #[derive(Clone, serde::Serialize)]
 struct Payload {
     mode: String,
@@ -45,7 +50,12 @@ fn main() {
 
     // Export types from rust functions into typescript file
     ts::export(
-        collect_types![get_config, update_config, audio::get_acap_files],
+        collect_types![
+            get_config,
+            update_config,
+            audio::get_acap_files,
+            record_main_audio
+        ],
         "../src/utils/bindings.ts",
     )
     .expect("Failed to export ts bindings");
@@ -66,7 +76,8 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             get_config,
             update_config,
-            audio::get_acap_files
+            audio::get_acap_files,
+            record_main_audio
         ])
         .on_window_event(|event| match event.event() {
             tauri::WindowEvent::CloseRequested { api, .. } => {

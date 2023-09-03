@@ -36,7 +36,7 @@ const changeStartRecordingKey = (startRecordingKey: FunctionKey) => {
 	return updateConfig({ startRecordingKey: startRecordingKey });
 };
 
-const Settings = () => {
+const SettingsPage = () => {
 	const {
 		register,
 		handleSubmit,
@@ -74,8 +74,6 @@ const Settings = () => {
 	}, [config, reset]);
 
 	const handleKeyDown = (e: KeyboardEvent<HTMLButtonElement>) => {
-		e.preventDefault();
-
 		const functionKeys: FunctionKey[] = [
 			"F1",
 			"F2",
@@ -168,4 +166,4 @@ const Settings = () => {
 	);
 };
 
-export default Settings;
+export default SettingsPage;

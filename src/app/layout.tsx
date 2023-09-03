@@ -6,6 +6,7 @@ import { ThemeProvider } from "next-themes";
 import { useEffect } from "react";
 import { emit, listen } from "@tauri-apps/api/event";
 import "./globals.css";
+import { recordMainAudio } from "@/utils/bindings";
 
 const queryClient = new QueryClient();
 
@@ -15,6 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 		void listen("keypress", ({ payload: { message } }) => {
 			console.log(message);
 		});
+		void recordMainAudio();
 	}, []);
 
 	useEffect(() => {
